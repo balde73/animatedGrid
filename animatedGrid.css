@@ -1,0 +1,44 @@
+
+.animated-grid{
+	position: 	relative;
+	font-size: 	0px;
+}
+
+.grid-elem{
+	display: 	inline-block;
+	vertical-align: top;
+}
+
+.grid-animation{
+	position: 	absolute;
+	left: 		0;
+	top: 		0;
+
+	-webkit-transform: scale(1);
+}
+
+.grid-animation.zoom-me{
+	-webkit-transform: scale(1.2);
+	-moz-transform: scale(1.2);
+	-ms-transform: scale(1.2);
+	-o-transform: scale(1.2);
+	transform: scale(1.2);
+
+	box-shadow: 0 0 20px rgba(0,0,0,.5);
+
+	-webkit-transition: .2s transform, .2s opacity;
+	-webkit-transition-delay: .05s;
+}
+
+.darker .grid-elem{
+	background-color: rgb(60,60,60);
+}
+
+.grid-elem img{
+	opacity: .7;
+}
+
+.person img{
+	width: 100%;
+	height: 100%;
+}
