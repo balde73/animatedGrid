@@ -29,16 +29,3 @@
 	-webkit-transition: .2s transform, .2s opacity;
 	-webkit-transition-delay: .05s;
 }
-
-.darker .grid-elem{
-	background-color: rgb(60,60,60);
-}
-
-.grid-elem img{
-	opacity: .6;
-}
-
-.person img{
-	width: 100%;
-	height: 100%;
-}
