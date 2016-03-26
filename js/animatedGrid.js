@@ -9,22 +9,6 @@ function SearchAnimatedGrid(){
 
 	this.listAnimatedGrid = [];
 
-	function drawGrid( grid ){
-		var square 	= ( grid.getAttribute("grid-square") ) ? grid.getAttribute("grid-square") : false;
-		var num 	= ( grid.getAttribute("grid-num") ) ? grid.getAttribute("grid-num") : "5";
-		
-		var listElement = grid.getElementsByClassName("grid-elem");
-
-		// itero su tutti gli elementi della griglia
-		for( var i=0; i<this.listElement.length; i++ ){
-			drawGridElement( listElement[i], num, square );
-		}
-	}
-
-	function drawGridElement( element, num, square ){
-
-	}
-
 	this.searchAll = function(){
 
 		this.listAnimatedGrid = document.getElementsByClassName("animated-grid");
@@ -60,8 +44,10 @@ function AnimatedGrid(){
 		for( var i=0; i<listElement.length; i++ ){
 			this.drawElement( listElement[i] );
 			listElement[i].addEventListener("mouseenter", this.animate);
-			listElement[i].addEventListener("mouseleave", removeAnimate);
 		}
+
+		// rimuovo l'animazione quando si esce dalla griglia
+		grid.addEventListener("mouseleave", removeAnimate);
 
 		if( this.animator == "" ){
 			// se non esiste lo creo
@@ -88,8 +74,6 @@ function AnimatedGrid(){
 		var parentGrid = this.parentElement;
 		var animator   = parentGrid.getElementsByClassName("grid-animation")[0];
 
-		console.log(animator);
-
 		animator.className 	= "grid-animation";
 		// prende la posizione dal padre!
 		// TODO: rendere generica (prendere la posizione a partire dalla griglia ovunque essa sia)
@@ -101,12 +85,8 @@ function AnimatedGrid(){
 		// aggiusto l'allineamento per i bordi
 		var adjustPosition = "";
 
-		console.log(parentGrid);
-
 		var offsetRight 	= parentGrid.offsetWidth - (this.offsetWidth+this.offsetLeft);
 		var offsetBottom 	= parentGrid.offsetHeight - (this.offsetHeight+this.offsetTop);
-
-		console.log(offsetBottom);
 
 		adjustPosition += (this.offsetTop==0) 		? " top" 	: "";
 		adjustPosition += (this.offsetLeft==0) 		? " left" 	: "";
@@ -125,9 +105,12 @@ function AnimatedGrid(){
 	}
 
 	function removeAnimate(){
-		//self.animator.style.left 	= "0px";
-		//self.animator.style.top 	= "0px";
-		//self.animator.style.height 	= "0px";
-		//self.animator.style.width 	= "0px";
+		// cerco l'animazione
+		var animator   		= this.getElementsByClassName("grid-animation")[0];
+		animator.className 	+= " zoom-out";
+
+		window.setTimeout(function(){
+			animator.className = "grid-animation hide"
+		}, 300);
 	}
 }
