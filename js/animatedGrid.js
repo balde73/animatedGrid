@@ -1,53 +1,90 @@
+/*
+In order to use the animatedGrid library you have to create the element SearchAnimatedGrid and call the function
+createGrids.
+Call it when you are ready (you have dynamically created all the elements of the grid) or when the document
+is loaded (if you are using a static page) like in the example above.
+
 document.addEventListener('DOMContentLoaded', function(){ 
 
     var a = new SearchAnimatedGrid();
-    a.searchAll();
+    a.createGrids();
 
 });
 
+*/
+
+
 function SearchAnimatedGrid(){
 
-	this.listAnimatedGrid = [];
+	this.listAnimatedGrid 			= [];
 
-	this.searchAll = function(){
+	this.createGrids = function(){
 
-		this.listAnimatedGrid = document.getElementsByClassName("animated-grid");
-	    for( var i=0; i<this.listAnimatedGrid.length; i++ ){
-	    	var animatedGrid = new AnimatedGrid();
-	    	animatedGrid.draw(this.listAnimatedGrid[i]);
+		var listElementAnimatedGrid = document.getElementsByClassName("animated-grid");
+	    
+		for( var i=0; i < listElementAnimatedGrid.length; i++ ){
+	    	var animatedGrid = new AnimatedGrid( listElementAnimatedGrid[i] );
+	    	this.listAnimatedGrid[i] = animatedGrid;
 	    }
 
+	    this.drawAll();
+	    window.addEventListener("resize", this.resizeAll);
+
+	    // controllo se è stata inserita la barra di scrolling
+		var body = document.body,
+    		html = document.documentElement;
+    	var documentHeight = Math.max( body.scrollHeight, body.offsetHeight, 
+                       html.clientHeight, html.scrollHeight, html.offsetHeight );
+		if (documentHeight > screen.height) {
+	        this.resizeAll();
+	    }
+	}
+
+	this.drawAll = function(){
+		for( var i=0; i < this.listAnimatedGrid.length; i++ ){
+			var animatedGrid = this.listAnimatedGrid[i];
+	    	animatedGrid.draw();
+	    }
+	}
+
+	thisSearchGrid = this;
+	this.resizeAll = function(){
+		for( var i=0; i < thisSearchGrid.listAnimatedGrid.length; i++ ){
+	    	var animatedGrid = thisSearchGrid.listAnimatedGrid[i];
+	    	animatedGrid.resize();
+	    }
 	}
 }
 
-function AnimatedGrid(){
+function AnimatedGrid( gridElement ){
 
-	this.parentGrid 	= [];
+	this.grid 			= gridElement;
 	this.width 			= 0;
 	this.square 		= false;
 	this.num 			= 0;
+	this.num_mob 		= 0;
 	this.listElement 	= [];
 	this.animator 		= [];
 
-	//chiamata 1volta e quando il numero di elementi cambia
-	this.draw = function( grid ){
+	//chiamata la prima volta e quando il numero di elementi cambia
+	this.draw = function(){
 
-		this.parentGrid = grid;
+		this.width   	= Math.floor(this.grid.offsetWidth-0.5);
+		this.square 	= ( this.grid.getAttribute("grid-square") ) 	? this.grid.getAttribute("grid-square") 	: false;
+		this.num 		= ( this.grid.getAttribute("grid-num") ) 	? this.grid.getAttribute("grid-num") 	: 5;
+		this.num_mob	= ( this.grid.getAttribute("grid-num-mob") ) ? this.grid.getAttribute("grid-num-mob") : this.num;
 
-		this.width   	= grid.offsetWidth;
-		this.square 	= ( grid.getAttribute("grid-square") ) ? grid.getAttribute("grid-square") : false;
-		this.num 		= ( grid.getAttribute("grid-num") ) ? grid.getAttribute("grid-num") : 5;
-		
-		var listElement = grid.getElementsByClassName("grid-elem");
+		this.listElement = this.grid.getElementsByClassName("grid-elem");
 
 		// itero su tutti gli elementi della griglia
-		for( var i=0; i<listElement.length; i++ ){
-			this.drawElement( listElement[i] );
-			listElement[i].addEventListener("mouseenter", this.animate);
+		for( var i=0; i<this.listElement.length; i++ ){
+			this.drawElement( this.listElement[i] );
+			this.listElement[i].removeEventListener("mouseenter", animate);
+			this.listElement[i].addEventListener("mouseenter", animate);
 		}
 
 		// rimuovo l'animazione quando si esce dalla griglia
-		grid.addEventListener("mouseleave", removeAnimate);
+		this.grid.addEventListener("mouseleave", removeAnimate);
 
 		if( this.animator == "" ){
 			// se non esiste lo creo
@@ -55,18 +92,34 @@ function AnimatedGrid(){
 			this.animator.className = "grid-animation";
 
 			// lo inserisco nella griglia
-			grid.appendChild( this.animator );
+			this.grid.appendChild( this.animator );
+		}
+
+
+		// aggiungo l'handler del resize
+		this.grid.addEventListener("resize", this.redraw);
+	}
+
+	this.resize = function(){
+		// aggiorno la width
+		this.width = Math.floor(this.grid.offsetWidth-0.5);
+		// itero su tutti gli elementi della griglia
+		for( var i=0; i<this.listElement.length; i++ ){
+			this.drawElement( this.listElement[i] );
 		}
 	}
 
 	this.drawElement = function( element ){
-		element.style.width  = this.width / this.num + "px";
+
+		var tab_num 	= (this.width > 540) ? this.num : this.num_mob;
+
+		var dimension  	= Math.floor(this.width / tab_num) + "px";
+		element.style.width = dimension;
 		if( this.square )
-			element.style.height = this.width / this.num + "px";
+			element.style.height = dimension;
 	}
 
-	self = this;
-	this.animate = function(){
+	function animate(){
 
 		// PROBLEMA: non si ricorda chi è il padre. self.parentGrid è cambiato!
 		// quindi ricalcolo il padre.... ovviamente non è corretto, va aggiustato
@@ -90,8 +143,8 @@ function AnimatedGrid(){
 
 		adjustPosition += (this.offsetTop==0) 		? " top" 	: "";
 		adjustPosition += (this.offsetLeft==0) 		? " left" 	: "";
-		adjustPosition += (offsetBottom==0) 		? " bottom" : "";
-		adjustPosition += (offsetRight==0) 			? " right" 	: "";
+		adjustPosition += (offsetBottom < 10) 		? " bottom" : "";
+		adjustPosition += (offsetRight < 10) 		? " right" 	: "";
 
 		animator.style.transformOrigin = adjustPosition;
 
