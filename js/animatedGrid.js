@@ -75,7 +75,7 @@ function AnimatedGrid( gridElement ){
 		this.num 		= ( this.grid.getAttribute("grid-num") ) 	? this.grid.getAttribute("grid-num") 	: 5;
 		this.num_mob	= ( this.grid.getAttribute("grid-num-mob") ) ? this.grid.getAttribute("grid-num-mob") : this.num;
 
-		this.perspective = ( this.grid.getAttribute("grid-perspective")=="true" ) ? true : false;
+		this.perspective = ( this.grid.getAttribute("grid-3d")=="true" ) ? true : false;
 		this.listElement = this.grid.getElementsByClassName("grid-elem");
 
 		// itero su tutti gli elementi della griglia
@@ -152,7 +152,7 @@ function AnimatedGrid( gridElement ){
 
 		// carico le informazioni
 
-		if( parentGrid.getAttribute("grid-perspective")=="true" ){
+		if( parentGrid.getAttribute("grid-3d")=="true" ){
 			//inserisco un layer di prospettiva se voglio l'effetto 3d
 			var perspective = document.createElement("div");
 			perspective.className = "grid-effect-3d card-2";
