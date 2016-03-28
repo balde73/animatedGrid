@@ -61,6 +61,7 @@ function AnimatedGrid( gridElement ){
 	this.grid 			= gridElement;
 	this.width 			= 0;
 	this.square 		= false;
+	this.perspective 	= false;
 	this.num 			= 0;
 	this.num_mob 		= 0;
 	this.listElement 	= [];
@@ -74,6 +75,7 @@ function AnimatedGrid( gridElement ){
 		this.num 		= ( this.grid.getAttribute("grid-num") ) 	? this.grid.getAttribute("grid-num") 	: 5;
 		this.num_mob	= ( this.grid.getAttribute("grid-num-mob") ) ? this.grid.getAttribute("grid-num-mob") : this.num;
 
+		this.perspective = ( this.grid.getAttribute("grid-perspective")=="true" ) ? true : false;
 		this.listElement = this.grid.getElementsByClassName("grid-elem");
 
 		// itero su tutti gli elementi della griglia
@@ -149,7 +151,20 @@ function AnimatedGrid( gridElement ){
 		animator.style.transformOrigin = adjustPosition;
 
 		// carico le informazioni
-		animator.innerHTML = this.innerHTML;
+
+		if( parentGrid.getAttribute("grid-perspective")=="true" ){
+			//inserisco un layer di prospettiva se voglio l'effetto 3d
+			var perspective = document.createElement("div");
+			perspective.className = "grid-effect-3d card-2";
+			perspective.innerHTML = this.innerHTML;
+			perspective.addEventListener("mousemove", cardAnimation);
+
+			animator.innerHTML = "";
+			animator.className += " grid-perspective";
+			animator.appendChild(perspective);
+		}
+		else
+			animator.innerHTML = this.innerHTML;
 
 		//add animation
 		window.setTimeout(function(){
@@ -165,5 +180,48 @@ function AnimatedGrid( gridElement ){
 		window.setTimeout(function(){
 			animator.className = "grid-animation hide"
 		}, 300);
+	}
+
+	function cardAnimation(event){
+		// TODO: utilizzare i prefissi!
+
+		browserPrefix = "";
+    	usrAg = navigator.userAgent;
+		if(usrAg.indexOf("Chrome") > -1 || usrAg.indexOf("Safari") > -1) {
+		    browserPrefix = "-webkit-";
+		} else if (usrAg.indexOf("Opera") > -1) {
+		    browserPrefix = "-o";
+		} else if (usrAg.indexOf("Firefox") > -1) {
+		    browserPrefix = "-moz-";
+		} else if (usrAg.indexOf("MSIE") > -1) {
+		    browserPrefix = "-ms-";
+		}
+
+		var posY = event.layerY;
+		var posX = event.layerX;
+
+		var dimX = Math.ceil(this.offsetWidth / 2.0);
+		var dimY = Math.ceil(this.offsetHeight / 2.0);
+
+		dx = posX - dimX;
+        dy = posY - dimY;
+
+        tiltx = (dy / dimY);
+        tilty = - (dx / dimX);
+        radius = Math.sqrt(Math.pow(tiltx, 2) + Math.pow(tilty, 2));
+        degree = (radius * 15);
+
+        shadx = degree*tiltx/1.3;   /*horizontal shadow*/
+        shady = degree*tilty/1.3;   /*vertical shadow*/
+
+    	this.style.transform = 'rotate3d(' + tiltx + ', ' + tilty + ', 0, ' + degree + 'deg)';
+
+    	if( dx>dimX ){
+            //this.style.boxShadow = (-shady) + 'px ' + (-shadx) +'px 8px rgba(0,0,0,.2)';
+    	}
+        else {
+        	//this.style.boxShadow = (shady) + 'px ' + (-shadx) +'px 8px rgba(0,0,0,.2)';
+        }
+
 	}
 }
