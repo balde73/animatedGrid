@@ -126,14 +126,16 @@ function AnimatedGrid( gridElement ){
 		// PROBLEMA: non si ricorda chi è il padre. self.parentGrid è cambiato!
 		// quindi ricalcolo il padre.... ovviamente non è corretto, va aggiustato
 
-		var parentGrid = this.parentElement;
-		var animator   = parentGrid.getElementsByClassName("grid-animation")[0];
-
 		// rimuovo la classe activated e la aggiungo all'elemento corrente
 		var cardActivated  = document.getElementsByClassName("grid-activated");
 		for(var i=0; i<cardActivated.length; i++)
 			cardActivated[i].className = cardActivated[i].className.replace(" grid-activated", "");
 		this.className = this.className + " grid-activated";
+		
+
+		var parentGrid = this.parentElement;
+		var animator   = parentGrid.getElementsByClassName("grid-animation")[0];
+		animator.addEventListener("click", clicked);
 
 		animator.className 	= "grid-animation";
 		// prende la posizione dal padre!
@@ -156,8 +158,7 @@ function AnimatedGrid( gridElement ){
 
 		animator.style.transformOrigin = adjustPosition;
 
-		// carico le informazioni
-
+		// carico le informazioni e l'animazione se grid-3d
 		if( parentGrid.getAttribute("grid-3d")=="true" ){
 			//inserisco un layer di prospettiva se voglio l'effetto 3d
 			var perspective = document.createElement("div");
@@ -235,5 +236,16 @@ function AnimatedGrid( gridElement ){
         	//this.style.boxShadow = (shady) + 'px ' + (-shadx) +'px 8px rgba(0,0,0,.2)';
         }
 
+	}
+
+	function clicked(){
+		var parentGrid 	= this.parentElement;
+		var callback 	= parentGrid.getAttribute("on-click-grid");
+
+		// http://stackoverflow.com/questions/30028331/pass-javascript-function-as-data-attribute-and-execute
+		var x = eval(callback);
+	    if (typeof x == 'function') {
+	        x( this.innerHTML );
+	    }
 	}
 }
