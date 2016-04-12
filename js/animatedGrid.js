@@ -129,6 +129,12 @@ function AnimatedGrid( gridElement ){
 		var parentGrid = this.parentElement;
 		var animator   = parentGrid.getElementsByClassName("grid-animation")[0];
 
+		// rimuovo la classe activated e la aggiungo all'elemento corrente
+		var cardActivated  = document.getElementsByClassName("grid-activated");
+		for(var i=0; i<cardActivated.length; i++)
+			cardActivated[i].className = cardActivated[i].className.replace(" grid-activated", "");
+		this.className = this.className + " grid-activated";
+
 		animator.className 	= "grid-animation";
 		// prende la posizione dal padre!
 		// TODO: rendere generica (prendere la posizione a partire dalla griglia ovunque essa sia)
@@ -173,6 +179,12 @@ function AnimatedGrid( gridElement ){
 	}
 
 	function removeAnimate(){
+
+		// rimuovo la classe activated
+		var cardActivated  = document.getElementsByClassName("grid-activated");
+		for(var i=0; i<cardActivated.length; i++)
+			cardActivated[i].className = cardActivated[i].className.replace(" grid-activated", "");
+
 		// cerco l'animazione
 		var animator   		= this.getElementsByClassName("grid-animation")[0];
 		animator.className 	+= " zoom-out";
